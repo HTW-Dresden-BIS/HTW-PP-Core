@@ -14,6 +14,8 @@ namespace OclAspectTest
 {
     public class CodeGenerator
     {
+        private static string _debugger = "false";
+        private static string _customMethod = "false";
         private struct Options
         {
             public readonly System.Type Context;
@@ -36,8 +38,11 @@ namespace OclAspectTest
         private readonly Options _options;
         private readonly dynamic _runtimeCode;
 
-        public CodeGenerator(IEnumerable<Assembly> targetAssemblies, Aspect aspect)
+        public CodeGenerator(IEnumerable<Assembly> targetAssemblies, Aspect aspect, bool debugger, bool customMethod)
         {
+            if (debugger) { _debugger = "true"; };
+            if (customMethod) { _customMethod = "true"; };
+            
             // HarmonyLib.Harmony.DEBUG = true;
             _options = new Options(aspect.ConstraintName,
                 GetTypeByName(aspect.ContextName)[0],
@@ -288,24 +293,20 @@ namespace HookClass_" + ns + @"
         public static bool HasPlanningError { get; private set; }
         private static void SetPlanningError(" + _options.Context + @" __instance)
         {
-            Console.WriteLine(""Protocol Type 0: Planning Error " + _options.ClassName + @"."");
             HasPlanningError = true;
 
-            System.Diagnostics.Debugger.Break();
             var self = __instance;   
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(@""C:\temp\"", ""Log.txt""), true))
             {
-                outputFile.WriteLine(""\nProtocol Type 0: Planning Error " + _options.ClassName + @"."");
-
                 //JsonConvert.SerializeObject()
-                if (true)
+                if (!" + _customMethod + @")
                 {
-                    outputFile.WriteLine(String.Format(""Protocol Type 1: Planning Error " + _options.ClassName + @" at Object: {0}"", JsonConvert.SerializeObject(self)));
-                    Console.WriteLine(String.Format(""Protocol Type 1: Planning Error " + _options.ClassName + @" at Object: {0}"", JsonConvert.SerializeObject(self)));
+                    outputFile.WriteLine(String.Format(""SerializeObject: Planning Error " + _options.ClassName + @" at Object: {0}"", JsonConvert.SerializeObject(self)));
+                    Console.WriteLine(String.Format(""SerializeObject: Planning Error " + _options.ClassName + @" at Object: {0}"", JsonConvert.SerializeObject(self)));
                 }
                 
-                //Additional Method
-                if (true)
+                //Custom Method
+                if (" + _customMethod + @")
                 {
                     IList<PropertyInfo> props = new List<PropertyInfo>(self.GetType().GetProperties());
                     string msg = """";                    
@@ -313,13 +314,13 @@ namespace HookClass_" + ns + @"
                     switch (self.GetType().Name)
                     {
                         case ""T_ProductionOrder"":
-                            msg = String.Format(""Protocol Type 2: Customized Methode for " + _options.ClassName + @". Error at Production Order with Id: {0} and Name: {1}"",
+                            msg = String.Format(""Custom Method: Customized Methode for " + _options.ClassName + @". Error at Production Order with Id: {0} and Name: {1}"",
                                 props.Single(p => p.Name == ""Id"").GetValue(self),
                                 props.Single(p => p.Name == ""Name"").GetValue(self));
                             break;
 
                         case ""T_ProductionOrderOperation"":
-                            msg = String.Format(""Protocol Type 2: Customized Methode for " + _options.ClassName + @". Error at Production Order Operation with Id: {0} and Name: {1}"",
+                            msg = String.Format(""Custom Method: Customized Methode for " + _options.ClassName + @". Error at Production Order Operation with Id: {0} and Name: {1}"",
                                 props.Single(p => p.Name == ""Id"").GetValue(self),
                                 props.Single(p => p.Name == ""Name"").GetValue(self));
                             break;
@@ -331,14 +332,15 @@ namespace HookClass_" + ns + @"
                     }
                     outputFile.WriteLine(msg);
                     Console.WriteLine(msg);
-                    
                 }
 
                 //Debugger
-                if (true)
+                if (" + _debugger + @")
                 {
-                    outputFile.WriteLine(""Protocol Type 3: Debugger called for " + _options.ClassName + @"."");
-                    Console.WriteLine(""Protocol Type 3: Debugger called for " + _options.ClassName + @"."");
+                    System.Diagnostics.Debugger.Break();                    
+                    outputFile.WriteLine(""Debugger called for " + _options.ClassName + @"."");
+                    Console.WriteLine(""Debugger called for " + _options.ClassName + @"."");
+                    
                 }
             }
         }

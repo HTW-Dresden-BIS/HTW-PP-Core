@@ -11,9 +11,13 @@ namespace OclAspectTest
     public class OclTestProvider
     {
         private IEnumerable<Assembly> _targetAssemblies;
+        private static bool _debugger = false;
+        private static bool _customMethod = false;
 
-        public static void AddConstraints(IEnumerable<string> targetAssemblies, string ocls)
+        public static void AddConstraints(IEnumerable<string> targetAssemblies, string ocls, bool debugger, bool customMethod)
         {
+            _debugger = debugger;
+            _customMethod = customMethod;
             new OclTestProvider(targetAssemblies.Select(Assembly.Load), ocls);
         }
         private void CompileOCLs(string ocls)
@@ -53,7 +57,9 @@ namespace OclAspectTest
 
             var gen = new CodeGenerator(
                 _targetAssemblies,
-                aspect
+                aspect,
+                _debugger,
+                _customMethod
             );
             // gen.InvokeApplyMethod();
             return gen;
