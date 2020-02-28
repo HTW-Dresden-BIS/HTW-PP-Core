@@ -61,6 +61,7 @@ namespace OclAspectTest
                 coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll",
                 coreDir.FullName + Path.DirectorySeparatorChar + "Microsoft.CSharp.dll",
                 coreDir.FullName + Path.DirectorySeparatorChar + "System.Collections.dll",
+                coreDir.FullName + Path.DirectorySeparatorChar + "Newtonsoft.Json.dll",
                 "OclAspectTest.dll"
                 // "Microsoft.CSharp.dll"
             };
@@ -229,6 +230,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json; 
 
 namespace HookClass_" + ns + @"
 {
@@ -258,7 +262,7 @@ namespace HookClass_" + ns + @"
             var foo = Traverse.Create(self);
             if (!(" + _options.BeforeCode + @"))
             {
-                SetPlanningError();
+                SetPlanningError(self);
             }
 
             Type newObjectType = self.GetType();
@@ -277,15 +281,66 @@ namespace HookClass_" + ns + @"
 
             if (!(" + _options.AfterCode + @"))
             {
-                SetPlanningError();
+                SetPlanningError(self);
             }
         }
 
         public static bool HasPlanningError { get; private set; }
-        private static void SetPlanningError()
+        private static void SetPlanningError(" + _options.Context + @" __instance)
         {
-            Console.WriteLine(""Planning Error " + _options.ClassName + @"."");
+            Console.WriteLine(""Protocol Type 0: Planning Error " + _options.ClassName + @"."");
             HasPlanningError = true;
+
+            System.Diagnostics.Debugger.Break();
+            var self = __instance;   
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(@""C:\temp\"", ""Log.txt""), true))
+            {
+                outputFile.WriteLine(""\nProtocol Type 0: Planning Error " + _options.ClassName + @"."");
+
+                //JsonConvert.SerializeObject()
+                if (true)
+                {
+                    outputFile.WriteLine(String.Format(""Protocol Type 1: Planning Error " + _options.ClassName + @" at Object: {0}"", JsonConvert.SerializeObject(self)));
+                    Console.WriteLine(String.Format(""Protocol Type 1: Planning Error " + _options.ClassName + @" at Object: {0}"", JsonConvert.SerializeObject(self)));
+                }
+                
+                //Additional Method
+                if (true)
+                {
+                    IList<PropertyInfo> props = new List<PropertyInfo>(self.GetType().GetProperties());
+                    string msg = """";                    
+
+                    switch (self.GetType().Name)
+                    {
+                        case ""T_ProductionOrder"":
+                            msg = String.Format(""Protocol Type 2: Customized Methode for " + _options.ClassName + @". Error at Production Order with Id: {0} and Name: {1}"",
+                                props.Single(p => p.Name == ""Id"").GetValue(self),
+                                props.Single(p => p.Name == ""Name"").GetValue(self));
+                            break;
+
+                        case ""T_ProductionOrderOperation"":
+                            msg = String.Format(""Protocol Type 2: Customized Methode for " + _options.ClassName + @". Error at Production Order Operation with Id: {0} and Name: {1}"",
+                                props.Single(p => p.Name == ""Id"").GetValue(self),
+                                props.Single(p => p.Name == ""Name"").GetValue(self));
+                            break;
+
+                        default:
+                            msg = String.Format(""Object type not handled. Object: {0}"", JsonConvert.SerializeObject(self));
+                            break;
+
+                    }
+                    outputFile.WriteLine(msg);
+                    Console.WriteLine(msg);
+                    
+                }
+
+                //Debugger
+                if (true)
+                {
+                    outputFile.WriteLine(""Protocol Type 3: Debugger called for " + _options.ClassName + @"."");
+                    Console.WriteLine(""Protocol Type 3: Debugger called for " + _options.ClassName + @"."");
+                }
+            }
         }
     }
 
