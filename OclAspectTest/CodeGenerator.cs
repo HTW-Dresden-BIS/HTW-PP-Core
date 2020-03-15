@@ -66,7 +66,7 @@ namespace OclAspectTest
                 coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll",
                 coreDir.FullName + Path.DirectorySeparatorChar + "Microsoft.CSharp.dll",
                 coreDir.FullName + Path.DirectorySeparatorChar + "System.Collections.dll",
-                coreDir.FullName + Path.DirectorySeparatorChar + "Newtonsoft.Json.dll",
+                typeof(Newtonsoft.Json.JsonConvert).Assembly.Location,
                 "OclAspectTest.dll"
                 // "Microsoft.CSharp.dll"
             };
@@ -296,7 +296,7 @@ namespace HookClass_" + ns + @"
             HasPlanningError = true;
 
             var self = __instance;   
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(@""C:\temp\"", ""Log.txt""), true))
+            using (StreamWriter outputFile = new StreamWriter(""Log.txt""))
             {
                 //JsonConvert.SerializeObject()
                 if (!" + _customMethod + @")
@@ -308,27 +308,21 @@ namespace HookClass_" + ns + @"
                 //Custom Method
                 if (" + _customMethod + @")
                 {
+                    //Add custom code here
                     IList<PropertyInfo> props = new List<PropertyInfo>(self.GetType().GetProperties());
-                    string msg = """";                    
+                    string msg = """";                   
 
                     switch (self.GetType().Name)
                     {
-                        case ""T_ProductionOrder"":
-                            msg = String.Format(""Custom Method: Customized Methode for " + _options.ClassName + @". Error at Production Order with Id: {0} and Name: {1}"",
-                                props.Single(p => p.Name == ""Id"").GetValue(self),
-                                props.Single(p => p.Name == ""Name"").GetValue(self));
-                            break;
-
-                        case ""T_ProductionOrderOperation"":
-                            msg = String.Format(""Custom Method: Customized Methode for " + _options.ClassName + @". Error at Production Order Operation with Id: {0} and Name: {1}"",
-                                props.Single(p => p.Name == ""Id"").GetValue(self),
-                                props.Single(p => p.Name == ""Name"").GetValue(self));
+                        case ""HowToUseIt"":
+                            msg = String.Format(""Benutzerspezifische Meldung für ein Objekt der Klasse " + _options.ClassName + 
+                            @". Mit der Möglichkeit Attribute auszugeben: {0}"",
+                                JsonConvert.SerializeObject(self));                                
                             break;
 
                         default:
                             msg = String.Format(""Object type not handled. Object: {0}"", JsonConvert.SerializeObject(self));
                             break;
-
                     }
                     outputFile.WriteLine(msg);
                     Console.WriteLine(msg);
