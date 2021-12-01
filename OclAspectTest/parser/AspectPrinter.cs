@@ -1390,7 +1390,7 @@ namespace OCL
             {
                 case "forall":
                     isLambdaExps.Push(true);
-                    return "TrueForAll";
+                    return "All";
                 case "sum": return "Sum";
                 case "isempty": return "IsEmpty";
                 case "notempty": return "NotEmpty";
@@ -1647,7 +1647,7 @@ namespace OCL
                 if (_i_ > 0) Render(LEFT_PARENTHESIS);
 
                 bool checkLambdaExpression = false;
-                if (Aspect.Code[Aspect.Code.Count - 1] == "TrueForAll" ||
+                if (Aspect.Code[Aspect.Code.Count - 1] == "All" ||
                     Aspect.Code[Aspect.Code.Count - 1] == "Exists")
                     checkLambdaExpression = true;
 
