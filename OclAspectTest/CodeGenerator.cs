@@ -48,7 +48,7 @@ namespace OclAspectTest
                 GetTypeByName(aspect.ContextName)[0],
                 aspect.FunctionName, aspect.BeforeCode, aspect.AfterCode);
 
-            var dd = typeof(Enumerable).GetTypeInfo().Assembly.Location;
+            var dd = typeof(String).GetTypeInfo().Assembly.Location;
             var coreDir = Directory.GetParent(dd);
             
             var refsNames = new[]
@@ -62,6 +62,7 @@ namespace OclAspectTest
                 typeof(Stack).GetTypeInfo().Assembly.Location,
                 typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).GetTypeInfo().Assembly.Location,
                 coreDir.FullName + Path.DirectorySeparatorChar + "mscorlib.dll",
+                coreDir.FullName + Path.DirectorySeparatorChar + "System.dll",
                 coreDir.FullName + Path.DirectorySeparatorChar + "netstandard.dll",
                 coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll",
                 coreDir.FullName + Path.DirectorySeparatorChar + "Microsoft.CSharp.dll",
