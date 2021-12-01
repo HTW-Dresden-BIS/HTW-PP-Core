@@ -33,6 +33,12 @@ namespace OclAspectTest
                 AfterCode = afterCode;
                 HookedFuncName = hookedFuncName;
             }
+
+            public override string ToString()
+            {
+                return "Options[Context=" + Context + ", ClassName=" + ClassName + ", BeforeCode=" + BeforeCode +
+                       ", AfterCode=" + AfterCode + ", HookedFuncName=" + HookedFuncName + "]";
+            }
         }
 
         private readonly Options _options;
@@ -238,6 +244,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.IO;
 using System.Text;
+using TestingMSAGL.DataStructure;
+using TestingMSAGL.DataStructure.RoutingOperation;
 using Newtonsoft.Json; 
 
 namespace HookClass_" + ns + @"
@@ -311,19 +319,21 @@ namespace HookClass_" + ns + @"
                 {
                     //Add custom code here
                     IList<PropertyInfo> props = new List<PropertyInfo>(self.GetType().GetProperties());
-                    string msg = """";                   
+                    string msg = ""Constraint failed.\n" + _options + @""";
 
-                    switch (self.GetType().Name)
-                    {
-                        case ""HowToUseIt"":
-                            msg = String.Format(""Benutzerspezifische Meldung für ein Objekt der Klasse " + _options.ClassName + 
+                    //switch (self.GetType().Name)
+                    //{
+                    //    case ""HowToUseIt"":
+                    //        msg = String.Format(""Benutzerspezifische Meldung für ein Objekt der Klasse " + _options.ClassName + 
                             @". Mit der Möglichkeit Attribute auszugeben: {0}"",
-                                JsonConvert.SerializeObject(self));                                
-                            break;
-
-                        default:
-                            msg = String.Format(""Object type not handled. Object: {0}"", JsonConvert.SerializeObject(self));
-                            break;
+                    //            JsonConvert.SerializeObject(self));                                
+                    //        break;
+                    //    default:
+                    //        msg = String.Format(""Object type not handled. Object: {0}"", JsonConvert.SerializeObject(self));
+                    //        break;
+                    //}
+                    if(self is Composite composite) {
+                        composite.Errors.Add(msg);
                     }
                     outputFile.WriteLine(msg);
                     Console.WriteLine(msg);
